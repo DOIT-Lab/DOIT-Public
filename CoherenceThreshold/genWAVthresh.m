@@ -2,6 +2,12 @@ function [cohThresh, t, f, n, eltime, alpha, coi]=...
     genWAVthresh(rtime, tTot, fs, alpha, svBool)
 % [cohThresh, t, f, n, eltime]=genWAVthresh(rtime, tTot, fs, alpha, svBool)
 % By Giles Blaney Fall 2018
+% 
+% G. Blaney, A. Sassaroli, and S. Fantini, “Algorithm for determination of
+% thresholds of significant coherence in time-frequency analysis,” Biomed.
+% Signal Process. Control, vol. 56, p. 101704, Feb. 2020.
+% https://doi.org/10.1016/j.bspc.2019.101704
+% 
 %   Inputs:
 %       rtime     - Approximate time to run in seconds
 %       tTot      - Total length of protocol in seconds
