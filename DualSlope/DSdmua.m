@@ -1,13 +1,34 @@
 function dmua = DSdmua(Y, dataTyp, opts)
 % dmua = DSdmua(Y, dataTyp, opts)
 %   Giles Blaney (Giles.Blaney@tufts.edu) Fall 2019
-%   REF...
-%   DESC...
-
-%     S1     DA DB     S2
-
-% Y=[A1; B1; B2; B1]
-% Y=[s1; l1; s2; l2]
+%   
+%   Blaney, G, Sassaroli, A, Pham, T, Fernandez, C, Fantini, S. Phase
+%   dual?slopes in frequency?domain near?infrared spectroscopy for enhanced
+%   sensitivity to brain tissue: First applications to human subjects. J.
+%   Biophotonics. 2019;e201960018. https://doi.org/10.1002/jbio.201960018
+%   
+%   Inputs:
+%       Y           - Time X 4 matrix of intensity or phase data with
+%                     following columns: Y=[Short1, Long1, Short2, Long2].
+%       dataTyp     - String specifying datatype, either 'intensity' or
+%                     'phase'. If datatype is 'phase' the units of Y are 
+%                     rad.
+%       opts        - Options structure containing the following fields:
+%                     ~ rho    - Array of source detector distances in mm.
+%                     ~ nin    - Assumed index of refection inside the 
+%                                medium, note it is assumed the outside 
+%                                index of refraction is 1.
+%                     ~ fmod   - Frequency domain modulation frequency in 
+%                                Hz.
+%                     ~ mua    - Assumed baseline absorption coefficient 
+%                                within the medium in 1/mm.
+%                     ~ musp   - Assumed baseline reduced scattering
+%                                coefficient within the medium in 1/mm.
+%                     ~ blInds - Time indices used to calculate baseline
+%                                slopes.
+%   Outputs:
+%       dmua        - Changes in the absorption coefficient calculated 
+%                     using dual-slope in 1/mm.
     
     %% Parse Input
     if nargin<=1
@@ -17,7 +38,7 @@ function dmua = DSdmua(Y, dataTyp, opts)
     if nargin<=2
         opts.rho=[25, 35]; %mm
         opts.nin=1.333;
-        opts.fmod=110e6; %Hz
+        opts.fmod=140.625e6; %Hz
         opts.mua=0.01; %1/mm
         opts.musp=1; %1/mm
         opts.blInds=1:size(Y, 1);
@@ -30,6 +51,7 @@ function dmua = DSdmua(Y, dataTyp, opts)
     optProp.mua=opts.mua;
     optProp.musp=opts.musp;
     fmod=opts.fmod;
+    rho=opts.rho;
     
     rhoAvg=mean(rho);
     rhoDel=diff(rho);
