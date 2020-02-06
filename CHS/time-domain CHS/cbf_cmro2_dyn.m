@@ -38,16 +38,15 @@ function cbf_cmro2 = cbf_cmro2_dyn(x,dynx,T0,dO,dD,Fs)
     tc  = x(1);
     tv  = x(2);
     Fpc = x(3);
-
-    pa = 0.3;
-    alpha = 0.98;
-
+    
     a = dynx(1);
     c = dynx(2);
     v = dynx(3);
 
     % Fixed parameters
     Sa = 0.98;
+    pa = 0.3;
+    alpha = 0.8;
 
     % Derived parameters
     pv = 1 - pa - Fpc;
