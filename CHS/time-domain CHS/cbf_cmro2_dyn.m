@@ -2,7 +2,7 @@ function cbf_cmro2 = cbf_cmro2_dyn(x,dynx,T0,dO,dD,Fs)
     % coherent hemodynamics spectroscopy model to calculate cbf-cmro2
     % Inputs:
     %       x  -   CHS baseline parameters
-    %              x = [tc tv F(c)CBV0c/CBV0 fc k]. Units are [s s - Hz -].
+    %              x = [tc tv F(c)CBV0c/CBV0]. Units are [s s -].
     %       dynx - CHS dynamic parameters: blood volume contributions from
     %               the arteries, capillaries, and veins to the total blood volume
     %              dynx = [CBVa/CBV, CBVc/CBV, CBVv/CBV].
