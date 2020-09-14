@@ -4,7 +4,7 @@ clear; home;
 
 % G. Blaney, A. Sassaroli, and S. Fantini, “Design of a source-detector 
 % array for dual-slope diffuse optical imaging,” Review of Scientific 
-% Instruments, Submitted.
+% Instruments, https://doi.org/10.1063/5.0015512.
 
 % NOTE: This code has not yet been optimized. Currently, its heavy
 % dependence on loops causes it to run slow. Future revisions will be

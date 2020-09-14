@@ -4,7 +4,7 @@ function armt=findSDsets(armt, arry)
 % 
 % G. Blaney, A. Sassaroli, and S. Fantini, “Design of a source-detector 
 % array for dual-slope diffuse optical imaging,” Review of Scientific 
-% Instruments, Submitted.
+% Instruments, https://doi.org/10.1063/5.0015512.
 % 
 %   Inputs:
 %       armt - Struct with the following fields:

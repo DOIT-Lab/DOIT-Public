@@ -4,7 +4,7 @@ function [Gamma_grid, Delta_grid]=GammaDelta(SpS, sz_grid, dr)
 % 
 % G. Blaney, A. Sassaroli, and S. Fantini, “Design of a source-detector 
 % array for dual-slope diffuse optical imaging,” Review of Scientific 
-% Instruments, Submitted.
+% Instruments, https://doi.org/10.1063/5.0015512.
 % 
 %   Inputs:
 %       SpS     - n X n array of pinv(S)*S
