@@ -1,5 +1,6 @@
 function A = n2A(nin, nout)
 % A = n2A(nin, nout)
+% Giles Blaney
 %   Inputs:
 %       nin  - Index of refraction inside medium
 %       nout - Index of refraction outside medium
