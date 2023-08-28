@@ -1,7 +1,5 @@
 Supporting code for:
-G. Blaney*, F. Ivich*, et al., "Dual-ratio approach for detection of point 
-fluorophores in biological tissue", JBO, In Rev. 2023
-https://doi.org/10.48550/arXiv.2305.14436
+Giles Blaney, Fernando Ivich, Angelo Sassaroli, Mark Niedre, Sergio Fantini, "Dual-ratio approach for detection of point fluorophores in biological tissue," J. Biomed. Opt. 28(7) 077001 (22 July 2023) https://doi.org/10.1117/1.JBO.28.7.077001
 
 - run_all.m
     This MATLAB script will call all subsequent scripts in the correct 
