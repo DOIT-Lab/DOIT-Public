@@ -1,0 +1,6 @@
+*.asv
+
+SensitivityCompendium/pullDeps.m
+SensitivityCompendium/deps/mcx*
+SensitivityCompendium/deps/example*
+SensitivityCompendium/makeFigs/*.mat
