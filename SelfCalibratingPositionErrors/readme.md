@@ -1,4 +1,4 @@
 Supporting code for:
-Giles Blaney, Angelo Sassaroli, Tapan Das, and Sergio Fantini, "Influence of Uncertainties in Optode Positions on Self-Calibrating or Dual-Slope Diffuse Optical Measurements", (in review)
+Giles Blaney, Angelo Sassaroli, Tapan Das, and Sergio Fantini, "Influence of Uncertainties in Optode Positions on Self-Calibrating or Dual-Slope Diffuse Optical Measurements", Photonics (in press)
 
-Code will be posted upon acceptance of the above manuscript which is in review 
+NOTE: deps directory must be included in your path
