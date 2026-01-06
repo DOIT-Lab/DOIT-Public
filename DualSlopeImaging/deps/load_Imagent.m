@@ -83,7 +83,7 @@ end
 %% Data
 x = find(data.data0 == 255);
 col = x(end)/size(data.data0,1);
-data.AUX = data0(:,col-setups.AuxCh:col-1);
+data.AUX = data0(:,round(col-setups.AuxCh):round(col-1));
 
 data.fs = setups.Fs;
 data.timemat = timeAxis(data.fs, size(data0, 1));
