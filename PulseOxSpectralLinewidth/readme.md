@@ -1,5 +1,4 @@
-﻿Code for manuscript in review
+﻿Code for manuscript:
 
-G. Blaney and S. Fantini, "Broad linewidth sources result in a skin-tone bias in non-invasive optical measurement of oxygen saturation," 2026, In-Review
-
-Preprint: https://doi.org/10.1364/opticaopen.31876567
+Giles Blaney, Sergio Fantini "Broad-linewidth sources result in a skin-tone bias in noninvasive optical measurement of oxygen saturation," Journal of Biomedical Optics 31(7), 070501 (9 Jul 2026)
+https://doi.org/10.1117/1.JBO.31.7.070501

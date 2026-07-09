@@ -1,4 +1,11 @@
 %% Giles Blaney, PhD; Spring 2026
+% Please cite
+% Giles Blaney, Sergio Fantini "Broad-linewidth sources result in a skin-tone
+% bias in noninvasive optical measurement of oxygen saturation,"
+% Journal of Biomedical Optics 31(7), 070501 (9 Jul 2026)
+% https://doi.org/10.1117/1.JBO.31.7.070501
+% for anything regarding this code.
+
 clear; home;
 
 %  Nominal RED and IR wavelengths & full width half maxes
@@ -29,9 +36,9 @@ m_max = 100;
 
 %% ########## Setup #######################################################
 % Load results from Monte Carlo based on the model in:
-% G. Blaney, J. Frias, F. Tavakoli, A. Sassaroli, and S. Fantini, 
-% "Dual-ratio approach to pulse oximetry and the effect of skin tone," 
-% JBO, vol. 29, no. S3, p. S33311, Oct. 2024, 
+% G. Blaney, J. Frias, F. Tavakoli, A. Sassaroli, and S. Fantini,
+% "Dual-ratio approach to pulse oximetry and the effect of skin tone,"
+% JBO, vol. 29, no. S3, p. S33311, Oct. 2024,
 % doi: 10.1117/1.JBO.29.S3.S33311
 if useMCpathlen
     MCavg = load('deps/MCout_avg.mat');
@@ -54,10 +61,10 @@ P0ir_LD(iIR) = 1; %power/nm
 E_OD = makeE('OD',lam); %(1/mm)/uM
 
 %% ########## Calculate total path-length in bulk tissue <L> ##############
-% Infinitesimal perturbation for numerical derivative 
+% Infinitesimal perturbation for numerical derivative
 dmua_numDer = 1e-6; %1/mm
 
-% Initialize optical property structure 
+% Initialize optical property structure
 optProp.nin=[];
 optProp.nout=1;
 optProp.musp=[]; %1/mm
@@ -66,18 +73,18 @@ optProp.mua=[]; %1/mm
 % Loop through wavelength and calculate <L> for each
 L = NaN(size(lam));
 for i = 1:length(lam)
-    
+
     % Set refractive index and reduced scattering coefficient
     optProp.nin=nTIS(i);
     optProp.musp=muspTIS(i); %1/mm
-    
-    % Calculate transmittance Green's function with a symmetric 
+
+    % Calculate transmittance Green's function with a symmetric
     % infinitesimal perturbation
     optProp.mua=muaTIS(i)-dmua_numDer/2; %1/mm
     Tgrn_0 = Tslab(rho, s, optProp, m_max); %1/mm^2
     optProp.mua=muaTIS(i)+dmua_numDer/2; %1/mm
     Tgrn_1 = Tslab(rho, s, optProp, m_max); %1/mm^2
-    
+
     % Find <L> via numerical derivative
     L(i) = -(log(Tgrn_1)-log(Tgrn_0))/dmua_numDer; %mm
 
@@ -86,7 +93,7 @@ end
 %% ########## Loop over all arterial oxygen saturations ###################
 % Variable initialization (below)
 
-% Intensity spectra emitted from tissue for illumination from the RED or 
+% Intensity spectra emitted from tissue for illumination from the RED or
 % IR LED (wavelength,SaO2,Melanin,FWHM)
 IredLED = NaN(length(lam),length(SaO2_all),length(Mfrac_all), ...
     length(LEDfwhm_all));
@@ -97,8 +104,8 @@ IirLED = NaN(length(lam),length(SaO2_all),length(Mfrac_all), ...
 RoR_LD = NaN(length(SaO2_all),length(Mfrac_all),length(LEDfwhm_all));
 RoR_LED = NaN(length(SaO2_all),length(Mfrac_all),length(LEDfwhm_all));
 
-% Recovered arterial oxygen saturations for LDs, LEDs with nominal 
-% extinction coefficients, or LEDs with weighted extinction coefficients 
+% Recovered arterial oxygen saturations for LDs, LEDs with nominal
+% extinction coefficients, or LEDs with weighted extinction coefficients
 % (SaO2,Melanin,FWHM)
 sat_LD_rec = NaN(length(SaO2_all),length(Mfrac_all),length(LEDfwhm_all));
 sat_LED_rec = NaN(length(SaO2_all),length(Mfrac_all),length(LEDfwhm_all));
@@ -106,24 +113,24 @@ satw_LED_rec = NaN(length(SaO2_all),length(Mfrac_all),length(LEDfwhm_all));
 
 % SaO2 loop
 for SaO2ind = 1:length(SaO2_all)
-    % Calculate changes in absorption given total-hemoglobin concentration 
+    % Calculate changes in absorption given total-hemoglobin concentration
     % and arterial oxygen saturation
     dO = dTart*SaO2_all(SaO2ind); %uM
     dD = dTart-dO; %uM
     dmua = E_OD*[dO;dD]; %1/mm
-    
+
     %% ########## Transmittance Green's functions #########################
-    % Loop through wavelength and calculate Green's function during 
+    % Loop through wavelength and calculate Green's function during
     % systolic and diastolic phases for each wavelength
     Tgrn_sys = NaN(size(lam));
     Tgrn_dia = NaN(size(lam));
     for i = 1:length(lam)
-        
+
         % Set refractive index and reduced scattering coefficient
         optProp.nin=nTIS(i);
         optProp.musp=muspTIS(i); %1/mm
-        
-        % Calculate transmittance Green's function with a symmetric 
+
+        % Calculate transmittance Green's function with a symmetric
         % blood volume perturbation
         optProp.mua=muaTIS(i)+dmua(i)/2; %1/mm
         Tgrn_sys(i) = Tslab(rho, s, optProp, m_max); %1/mm^2
@@ -131,22 +138,22 @@ for SaO2ind = 1:length(SaO2_all)
         Tgrn_dia(i) = Tslab(rho, s, optProp, m_max); %1/mm^2
 
     end
-    
+
     %% ########## Loop through melanin concentrations #####################
     for melInd = 1:length(Mfrac_all)
         % Absorption of epidermis from melanosomes using Equation 8 in:
-        % S. L. Jacques, "Optical properties of biological tissues: a 
-        % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013, 
+        % S. L. Jacques, "Optical properties of biological tissues: a
+        % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013,
         % doi: 10.1088/0031-9155/58/11/r37
         muaEPI = Mfrac_all(melInd) * 51.9*(lam/500).^-3.5; %1/mm
 
         %% Determine length through epidermal melanin filter
         if useMCpathlen
-            % Find index of closest melanin concentration in Monte Carlo 
+            % Find index of closest melanin concentration in Monte Carlo
             % data
             [~,iM_MC] = min(abs( MCavg.Mfracs - Mfrac_all(melInd) ));
-            
-            % Map partial path-lengths from Monte Carlo onto the simulated 
+
+            % Map partial path-lengths from Monte Carlo onto the simulated
             % wavelengths
             tmpLam = movmean(MCavg.lams, 10); %nm
             tmpL = movmean(MCavg.l(iM_MC,:,1), 10); %mm
@@ -156,22 +163,22 @@ for SaO2ind = 1:length(SaO2_all)
             % Assume 0.25 mm thick on each side
             d = 0.25*2; %mm
         end
-        
+
         %% ########## Loop through FWHM cases #############################
         for fwhmInd = 1:length(LEDfwhm_all)
-            % Generate LED emission spectra 
+            % Generate LED emission spectra
             P0red_LED = LEDspec_func(lam, lamRED, LEDfwhm_all(fwhmInd));
             P0ir_LED = LEDspec_func(lam, lamIR, LEDfwhm_all(fwhmInd));
-        
+
             %% ########## Model spectra reaching the detector #############
-            % Spectra for LD and systolic or diastolic cases (will be the 
+            % Spectra for LD and systolic or diastolic cases (will be the
             % same for every FWHM loop iteration)
             IredLD_sys = P0red_LD .* exp(-muaEPI.*d) .* Tgrn_sys;
             IirLD_sys = P0ir_LD .* exp(-muaEPI.*d) .* Tgrn_sys;
             IredLD_dia = P0red_LD .* exp(-muaEPI.*d) .* Tgrn_dia;
             IirLD_dia = P0ir_LD .* exp(-muaEPI.*d) .* Tgrn_dia;
-            
-            % Spectra for LED and systolic or diastolic cases (will depend 
+
+            % Spectra for LED and systolic or diastolic cases (will depend
             % on FWHM loop iteration)
             IredLED_sys = P0red_LED .* exp(-muaEPI.*d) .* Tgrn_sys;
             IirLED_sys = P0ir_LED .* exp(-muaEPI.*d) .* Tgrn_sys;
@@ -183,24 +190,24 @@ for SaO2ind = 1:length(SaO2_all)
                 (IredLED_sys+IredLED_dia)/2;
             IirLED(:,SaO2ind,melInd,fwhmInd) = ...
                 (IirLED_sys+IirLED_dia)/2;
-            
+
             %% ########## Find detected signals ###########################
-            % Sum spectra reaching the detectors to find detected signal 
-            % for LDs during systolic and diastolic phases  (will be the 
+            % Sum spectra reaching the detectors to find detected signal
+            % for LDs during systolic and diastolic phases  (will be the
             % same for every FWHM loop iteration)
             IredLD_sys_det = sum(IredLD_sys);
             IirLD_sys_det = sum(IirLD_sys);
             IredLD_dia_det = sum(IredLD_dia);
             IirLD_dia_det = sum(IirLD_dia);
-            
-            % Sum spectra reaching the detectors to find detected signal 
-            % for LEDs during systolic and diastolic phases  (will depend 
+
+            % Sum spectra reaching the detectors to find detected signal
+            % for LEDs during systolic and diastolic phases  (will depend
             % on FWHM loop iteration)
             IredLED_sys_det = sum(IredLED_sys);
             IirLED_sys_det = sum(IirLED_sys);
             IredLED_dia_det = sum(IredLED_dia);
             IirLED_dia_det = sum(IirLED_dia);
-    
+
             %% ########## Calculate ratio-of-ratios #######################
             RoR_LD(SaO2ind,melInd,fwhmInd) = ...
                 ((IredLD_sys_det-IredLD_dia_det)/IredLD_dia_det)/...
@@ -208,42 +215,42 @@ for SaO2ind = 1:length(SaO2_all)
             RoR_LED(SaO2ind,melInd,fwhmInd) = ...
                 ((IredLED_sys_det-IredLED_dia_det)/IredLED_dia_det)/...
                 ((IirLED_sys_det-IirLED_dia_det)/IirLED_dia_det);
-            
+
             %% ########## Apply modified Beer Lambert law #################
-            % Generate matrix of extinction coefficients for oxy- and 
+            % Generate matrix of extinction coefficients for oxy- and
             % deoxy-hemoglobin only at the nominal wavelengths
             E_mBLL = makeE('OD', [lamRED,lamIR]);
-            
+
             % Calculate recovered absorption changes for LDs
             dmuaRED_LD = -log(IredLD_sys_det/IredLD_dia_det)/L(iRED);
             dmuaIR_LD = -log(IirLD_sys_det/IirLD_dia_det)/L(iIR);
-            
-            % Convert absorption to concentration and calculate recovered 
+
+            % Convert absorption to concentration and calculate recovered
             % oxygen saturation for LDs
             dC_LD = E_mBLL\[dmuaRED_LD;dmuaIR_LD];
             dO_LD_rec = dC_LD(1);
             dD_LD_rec = dC_LD(2);
             sat_LD_rec(SaO2ind,melInd,fwhmInd) = ...
                 dO_LD_rec / (dO_LD_rec+dD_LD_rec);
-            
+
             % Calculate recovered absorption changes for LEDs
             dmuaRED_LED = -log(IredLED_sys_det/IredLED_dia_det)/L(iRED);
             dmuaIR_LED = -log(IirLED_sys_det/IirLED_dia_det)/L(iIR);
-            
-            % Convert absorption to concentration and calculate recovered 
+
+            % Convert absorption to concentration and calculate recovered
             % oxygen saturation for LDs
             dC_LED = E_mBLL\[dmuaRED_LED;dmuaIR_LED];
             dO_LED_rec = dC_LED(1);
             dD_LED_rec = dC_LED(2);
             sat_LED_rec(SaO2ind,melInd,fwhmInd) = ...
                 dO_LED_rec / (dO_LED_rec+dD_LED_rec);
-            
+
             %% ########## Implement weighted extinction coefficients ######
-            % Generate extinction spectra for oxy- and deoxy-hemoglobin 
+            % Generate extinction spectra for oxy- and deoxy-hemoglobin
             extO = makeE('O',lam);
             extD = makeE('D',lam);
 
-            % Weight extinction coefficients by the spectra reaching the 
+            % Weight extinction coefficients by the spectra reaching the
             % detectors
             Wred = IredLED(:,SaO2ind,melInd,fwhmInd);
             Wir = IirLED(:,SaO2ind,melInd,fwhmInd);
@@ -251,8 +258,8 @@ for SaO2ind = 1:length(SaO2_all)
             extDred = sum(Wred.*extD)/sum(Wred);
             extOir = sum(Wir.*extO)/sum(Wir);
             extDir = sum(Wir.*extD)/sum(Wir);
-            
-            % Convert absorption to concentration and calculate recovered 
+
+            % Convert absorption to concentration and calculate recovered
             % oxygen saturation considering weighted coefficients for LEDs
             Ew_mBLL = [
                 extOred, extDred;
@@ -320,8 +327,8 @@ set(gca, "Position",pos);
 
 % -------------------------------------------------------------------------
 % Absorption of epidermis from melanosomes using Equation 8 in:
-% S. L. Jacques, "Optical properties of biological tissues: a 
-% review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013, 
+% S. L. Jacques, "Optical properties of biological tissues: a
+% review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013,
 % doi: 10.1088/0031-9155/58/11/r37
 muaEPI = Mfrac_all(Mind) * 51.9*(lam/500).^-3.5; %1/mm
 
@@ -380,7 +387,7 @@ for i = 1:length(Mfrac_all)
     plot(RoR_LD(:,i,fwhmInd), SaO2_all,'-',...
         'Color',colsM(i,:));
     hold on;
-    
+
     p = polyfit(RoR_LD(:,i,fwhmInd),SaO2_all,1);
     slp_LD(i) = p(1);
 end
@@ -532,7 +539,7 @@ linkaxes([ax1,ax2],'xy');
 
 % =============== LED Spectra =============================================
 function [P0_LED] = LEDspec_func(lam, lamPK, lamFWHM)
-    
+
     % Generate Gaussian and normalize
     P0_LED = normpdf(lam, ...
         lamPK, lamFWHM/(2*sqrt(2*log(2))));
@@ -543,14 +550,14 @@ end
 % =============== Tissue Optical Properties ===============================
 function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
     % Tissue optical properties based on:
-    % S. L. Jacques, "Optical properties of biological tissues: a 
-    % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013, 
+    % S. L. Jacques, "Optical properties of biological tissues: a
+    % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013,
     % doi: 10.1088/0031-9155/58/11/r37
 
     % By default use relative tissue volumes from model in:
-    % G. Blaney, J. Frias, F. Tavakoli, A. Sassaroli, and S. Fantini, 
-    % "Dual-ratio approach to pulse oximetry and the effect of skin tone," 
-    % JBO, vol. 29, no. S3, p. S33311, Oct. 2024, 
+    % G. Blaney, J. Frias, F. Tavakoli, A. Sassaroli, and S. Fantini,
+    % "Dual-ratio approach to pulse oximetry and the effect of skin tone,"
+    % JBO, vol. 29, no. S3, p. S33311, Oct. 2024,
     % doi: 10.1117/1.JBO.29.S3.S33311
     % Thus V_tisTyp/V_tot,noEpi are:
     % Bone = 0.119
@@ -559,7 +566,7 @@ function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
     % Dermis = 0.196
     arguments
         lam (:,1) double; %nm
-        
+
         NVA.T (1,1) double = ...
             69.8*0.119 + 117*0.457 + 12.5*0.228 + 4.70*0.196; %uM
         NVA.S (1,1) double = ...
@@ -568,7 +575,7 @@ function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
             0.318*0.119 + 0.795*0.457 + 0.110*0.228 + 0.650*0.196;
         NVA.L (1,1) double = ...
             0.00*0.119 + 0.00*0.457 + 0.69*0.228 + 0.00*0.196;
-    
+
         NVA.ap (1,1) double = ...
             15.3*0.119 + 13.0*0.457 + 34.2*0.228 + 43.6*0.196; %1/cm
         NVA.fray (1,1) double = ...
@@ -576,7 +583,7 @@ function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
         NVA.bMie (1,1) double = ...
             0.326*0.119 + 0.926*0.457 + 0.567*0.228 + 0.562*0.196;
     end
-    
+
     %% musp
     ap = NVA.ap; % 1/cm
     fRay = NVA.fray;
@@ -584,17 +591,17 @@ function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
     % Combination of Rayleigh and Mie scattering
     muspTIS = ap*0.1*(fRay*(lam/500).^-4 ...
         + (1-fRay)*(lam/500).^-bMie); %1/mm
-    
+
     %% mua
     T = NVA.T; % uM
     S = NVA.S;
     W = NVA.W;
     L = NVA.L;
-    
+
     % Beer's law
     E_ODWL = makeE('ODWL', lam);
     muaTIS = E_ODWL * [T*S; T*(1-S); W; L];
-    
+
     %% n
     % https://www.engineersedge.com/physics/refraction_for_water__15690.htm
     % at 40 deg C
@@ -603,10 +610,10 @@ function [muspTIS, muaTIS, nTIS] = tissueOptProps_func(lam, NVA)
         1.39046, 1.34540, 1.34065, 1.33095, 1.32972, 1.32296].';
     n_water=interp1(n_waterRef(:, 1), n_waterRef(:, 2), lam, ...
         'linear', 'extrap');
-    
+
     % Equation 3 in:
-    % S. L. Jacques, "Optical properties of biological tissues: a 
-    % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013, 
+    % S. L. Jacques, "Optical properties of biological tissues: a
+    % review," PMB, vol. 58, no. 11, pp. R37–R61, May 2013,
     % doi: 10.1088/0031-9155/58/11/r37
     n_dry = 1.514;
     nTIS = n_dry - (n_dry - n_water) * W;
@@ -617,44 +624,44 @@ end
 function T = Tslab(rho, s, optProp, m_max)
     % Transmitance for a slab with extrapolated boundary
     % Equation 4.35 in:
-    % F. Martelli, S. Del Bianco, A. Ismaelli, and G. Zaccanti, Light 
-    % Propagation through Biological Tissue and Other Diffusive Media. 
-    % 1000 20th Street, Bellingham, WA 98227-0010 USA: SPIE, 2010. 
+    % F. Martelli, S. Del Bianco, A. Ismaelli, and G. Zaccanti, Light
+    % Propagation through Biological Tissue and Other Diffusive Media.
+    % 1000 20th Street, Bellingham, WA 98227-0010 USA: SPIE, 2010.
     % doi: 10.1117/3.824746
     arguments (Input)
-        rho (1,1) double; %mm -- Source detector distance 
+        rho (1,1) double; %mm -- Source detector distance
         s (1,1) double; %mm -- Slab thickness
-        
+
         optProp struct = [];
         m_max (1,1) double = 100;
     end
     arguments (Output)
         T (1,1) double; %1/mm^2 -- Transmittance Green's function
     end
-    
+
     % Set default optical properties if input not given
     if isempty(optProp)
         clear optProp;
-        
+
         optProp.nin=1.4;
         optProp.nout=1;
         optProp.musp=1.1; %1/mm
         optProp.mua=0.011; %1/mm
-        
+
         warning('Default optical properties used');
     end
-    
+
     mua = optProp.mua; %1/mm
     D = 1/(3*optProp.musp); %mm
-    
+
     zs = 1/optProp.musp; %mm
     A = n2A(optProp.nin,optProp.nout);
     ze = 2*A*D; %mm
-    
+
     m = (-m_max:m_max).';
     z1m = (1-2*m)*s - 4*m*ze - zs; %mm
     z2m = (1-2*m)*s - (4*m-2)*ze + zs; %mm
-    
+
     T = (1/(4*pi)) * sum( ...
         z1m.*(rho^2+z1m.^2).^(-3/2) .* ...
         (1+(mua*(rho^2+z1m.^2)/D).^(1/2)) .* ...
@@ -669,7 +676,7 @@ end
 % =============== Reflection Parameter ====================================
 function A = n2A(nin, nout)
 % Based on:
-% R. Aronson, "Boundary conditions for diffusion of light," JOSA A, 
+% R. Aronson, "Boundary conditions for diffusion of light," JOSA A,
 % vol. 12, no. 11, pp. 2532–2539, Nov. 1995, doi: 10/dff63n.
 
 % A = n2A(nin,nout)
@@ -703,8 +710,8 @@ end
 function E = makeE(chroms, lambda)
 % E = makeE(chroms, lambda)
 % Giles Blaney Spring 2021
-% 
-% Inputs:   - chroms: String of chromophores to include in E. 
+%
+% Inputs:   - chroms: String of chromophores to include in E.
 %                     Available chromophores:
 %                     - O: Oxyhemoglobin
 %                     - D: Deoxyhemoglobin
@@ -714,14 +721,14 @@ function E = makeE(chroms, lambda)
 %                     Spaces are ignored.
 %           - lambda: Vectors of wavelengths (nm).
 %                     (Default: [830, 690])
-% 
+%
 % Output:   - E: Extinction coefficient matrix.
 %                Units: 1/(mm uM) for O, D, CCOo, and CCOr
 %                       1/mm for W, L, and C
 %                size(E)=[length(lambda), length(chroms)];
 %                Defined as mua=E*C
 %                Order of C is defined by order in chroms input
-    
+
 % Relevant references in .mat files for each chromophore
 
     if nargin<=0
@@ -733,9 +740,9 @@ function E = makeE(chroms, lambda)
     if size(lambda, 1)==1
         lambda=lambda';
     end
-    
+
     chroms=chroms(~isspace(chroms));
-    
+
     E=[];
     while ~isempty(chroms)
         switch chroms(1)
